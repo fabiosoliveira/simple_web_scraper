@@ -15,7 +15,9 @@ type Collector struct {
 
 func NewCollector() *Collector {
 	return &Collector{
-		caracters: make([]rune, 0),
+		caracters:       make([]rune, 0),
+		htmlCallbacks:   make(map[string]func(text string)),
+		scrapedCallback: nil,
 	}
 }
 
