@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/fabiosoliveira/simple_web_scraper/pkg/scrap"
 )
@@ -9,12 +11,19 @@ import (
 func main() {
 	ch := make(chan scrap.Product)
 
-	go scrap.GetMercadoLivreProducts("bau bauleto givi e27", ch)
-
-	count := 0
-	for range ch {
-		count++
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: go run main.go <search>")
+		return
 	}
 
-	fmt.Println(count)
+	search := strings.Join(os.Args[1:], " ")
+
+	go scrap.GetMercadoLivreProducts(search, ch)
+
+	for product := range ch {
+		fmt.Println()
+		fmt.Println(product)
+	}
+
+	fmt.Printf("Search: %s\n", search)
 }
