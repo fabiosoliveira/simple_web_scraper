@@ -10,17 +10,15 @@ import (
 )
 
 func GetMercadoLivreProducts(seach string, ch chan<- Product) {
-	// instantiate a new collector object
 	c := colly.NewCollector()
 
-	// OnError callback
 	c.OnError(func(_ *colly.Response, err error) {
 		log.Println("Something went wrong:", err)
 	})
 
 	c.OnHTML("ol li", func(e *colly.HTMLElement) {
 		Link := e.ChildAttr("a", "href")
-		Name := e.ChildText("h2")
+		Name := e.ChildText("h3.poly-component__title-wrapper a")
 		Value := sanitizerFloat(e.ChildText("div.poly-price__current span:nth-child(1)"))
 
 		ch <- Product{
@@ -32,11 +30,7 @@ func GetMercadoLivreProducts(seach string, ch chan<- Product) {
 
 	// OnScraped callback
 	c.OnScraped(func(r *colly.Response) {
-		fmt.Println("Finished scraping:", r.Request.URL.String())
-
-		// for _, product := range products {
-		// 	fmt.Println("\n\n", product)
-		// }
+		fmt.Println("\nFinished scraping:", r.Request.URL.String())
 		close(ch)
 	})
 
