@@ -2,34 +2,19 @@ package main
 
 import (
 	"fmt"
-	"log"
 
-	"github.com/gocolly/colly"
+	"github.com/fabiosoliveira/simple_web_scraper/pkg/scrap"
 )
 
 func main() {
-	// instantiate a new collector object
-	c := colly.NewCollector()
+	ch := make(chan scrap.Product)
 
-	// OnError callback
-	c.OnError(func(_ *colly.Response, err error) {
-		log.Println("Something went wrong:", err)
-	})
+	go scrap.GetMercadoLivreProducts("bau bauleto givi e27", ch)
 
-	c.OnHTML("ol li", func(e *colly.HTMLElement) {
-		fmt.Println(e.ChildAttr("a", "href"))
-		// product.Image = e.ChildAttr("img", "src")
-		// product.Name = e.ChildText(".product-name")
-		fmt.Println(e.ChildText("h2"))
-		fmt.Println(e.ChildText("div.poly-price__current span:nth-child(1)"))
-		fmt.Println()
-	})
+	count := 0
+	for range ch {
+		count++
+	}
 
-	// OnScraped callback
-	c.OnScraped(func(r *colly.Response) {
-		fmt.Println("Finished scraping:", r.Request.URL.String())
-	})
-
-	// open the target URL
-	c.Visit("https://lista.mercadolivre.com.br/bau-bauleto-givi-e27")
+	fmt.Println(count)
 }
